@@ -1,26 +1,85 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import API from '../services/api'
 
-const Login = () => {
+const Login = () => { 
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+
+  const navigate = useNavigate();
+
+  const HandleLogin = async () => {
+    const res=await API.post("/auth/login",{
+      email,
+      password
+    });
+
+    
+    let role;
+
+    if (email === "posgeishrat@gmail.com") {
+      role = "admin";
+    } else {
+      role = "user";
+    }
+
+    // store user
+    localStorage.setItem(
+      "token",
+      JSON.stringify( res.data.token);
+    );
+
+    // redirect based on role
+    if (role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/user");
+    }
+  };
+
   return (
-    <> 
-    <div className='h-120 w-100 white bg-indigo-950 shadow-lg shadow-white text-white font-bold' >
-      <div className='justify-center items-centerp-10 gap-5'>
-         <h2>Login</h2>
-        <h5>Please login to access your Account</h5>
-      </div>
-
-      <div className=' flex flex-col-reverse rounded-xl justify-center items-center p-10 gap-10'>
-         <input type="email" className="border p-5 rounded w-4/4 text-1xl font-bold" placeholder="Enter your email"/>
-
-        <input type="password" className="border p-5 rounded w-4/4 text-1xl " placeholder="Enter your Password"/>
-      </div>
-        <div className='flex gap-5 p-5'>
-          <h3>New To MeetNest?</h3>
-          <button>Login</button>
+    <div className='bg-gray-50 h-screen w-screen flex flex-col items-center justify-center'>
+      <div className='h-100 w-150 bg-white shadow-xl shadow-gray-300 rounded flex flex-col gap-5'>
+        <div className='py-5 space-y-1 '>
+          <h1 className='text-3xl font-bold text-center'>Welcome Back!</h1>
+          <p className='text-center'>Dont have an Account? Sign Up</p>
         </div>
-      
+
+        <div className='flex flex-col items-center justify-center gap-5'>
+          <div className='flex flex-col '>
+            <input
+              className='border-black border-2 h-10 w-80 '
+              type='email'
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              placeholder='Enter email'
+            /><br />
+
+            <input
+              className='border-black border-2 h-10 w-80'
+              type='password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder='Enter password'
+            />
+          </div>
+
+          <button
+            onClick={HandleLogin}
+            className='h-13 w-25 rounded bg-blue-950 text-white active:scale-95 font-bold cursor-pointer text-xl'
+          >
+            Login
+          </button>
+        </div>
+
+        <div className='flex gap-7 items-center justify-center text-2xl'>
+          <h2>Google</h2>
+          <h2>Email</h2>
+          <h2>Number</h2>
+        </div>
+      </div>
     </div>
-    </>
   )
 }
 
