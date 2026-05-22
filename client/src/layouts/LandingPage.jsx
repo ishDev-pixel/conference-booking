@@ -8,7 +8,7 @@ import About from './About'
 
 const LandingPage = () => {
   return (
-    <div className='pt-23' >
+    <div className='pt-24' >
         
         <Section1/>
         <Section2/>

@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 
 const About = () => {
   return (
-    <div className='h-screen w-screen bg-indigo-100  '>
+    <div className='h-screen w-screen pt-24 overflow-hidden bg-indigo-100  '>
         <div className='h-40 w-screen  border-b-2 flex p-5'>
              <div className='h-22   flex '>
                   <div className='flex itewms-center p-4'>

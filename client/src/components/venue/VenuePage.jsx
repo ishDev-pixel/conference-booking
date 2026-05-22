@@ -1,10 +1,7 @@
-
 import { motion } from 'motion/react'
-import { useState } from 'react';
-import BookingPage from "../../pages/BookingPage";
-
-
-
+import { useState, useEffect } from 'react'
+import BookingPage from "../../pages/BookingPage"
+import API from "../../services/api"
 
 const VenuePage = () => {
 
@@ -20,140 +17,176 @@ const VenuePage = () => {
     "Outdoor"
   ];
 
- const venues = [
-  {
-    name: "Skyline Conference Center",
-    category: "Conference",
-    location: "Midtown",
-    style: "Boardroom",
-    features: "4K Display, Projector",
-    capacity: 15,
-    price: "$120/hour",
-    image: "https://plus.unsplash.com/premium_photo-1681487146511-43e0a6382a83?w=600"
-  },
-  {
-    name: "City Meeting Room",
-    category: "Meeting",
-    location: "Downtown",
-    style: "Discussion",
-    features: "TV, Whiteboard",
-    capacity: 10,
-    price: "$80/hour",
-    image: "https://images.unsplash.com/photo-1596079890701-dd42edf0b7c8?w=600"
-  },
-  {
-    name: "Grand Event Hall",
-    category: "Event Hall",
-    location: "Central",
-    style: "Executive",
-    features: "Stage, Lighting",
-    capacity: 50,
-    price: "$200/hour",
-    image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600"
-  },
-    {
-    name: "Skyline Conference Center",
-    category: "Conference",
-    location: "Midtown",
-    style: "Boardroom",
-    features: "4K Display, Projector",
-    capacity: 15,
-    price: "$120/hour",
-    image: "https://plus.unsplash.com/premium_photo-1681487146511-43e0a6382a83?w=600"
-  },
-    {
-    name: "Skyline Conference Center",
-    category: "Conference",
-    location: "Midtown",
-    style: "Boardroom",
-    features: "4K Display, Projector",
-    capacity: 15,
-    price: "$120/hour",
-    image: "https://plus.unsplash.com/premium_photo-1681487146511-43e0a6382a83?w=600"
-  },
-    {
-    name: "Skyline Conference Center",
-    category: "Conference",
-    location: "Midtown",
-    style: "Boardroom",
-    features: "4K Display, Projector",
-    capacity: 15,
-    price: "$120/hour",
-    image: "https://plus.unsplash.com/premium_photo-1681487146511-43e0a6382a83?w=600"
-  }
-];
+  // ✅ STATE
+  const [venues, setVenues] = useState([]);
+  const [selectedCategory, setSelectedCategory] =
+    useState("All");
 
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
 
+  // ✅ FETCH VENUES
+  useEffect(() => {
+
+    const fetchVenues = async () => {
+
+      try {
+
+        setLoading(true);
+
+        const res = await API.get("/venues");
+
+        console.log("VENUES:", res.data);
+
+        // ✅ BACKEND RETURNS ARRAY
+        if (Array.isArray(res.data)) {
+
+          setVenues(res.data);
+
+        }
+
+        // ✅ BACKEND RETURNS OBJECT
+        else if (
+          res.data &&
+          Array.isArray(res.data.venues)
+        ) {
+
+          setVenues(res.data.venues);
+
+        }
+
+        // ❌ INVALID RESPONSE
+        else {
+
+          setVenues([]);
+
+        }
+
+      } catch (err) {
+
+        console.error("FETCH ERROR:", err);
+
+        setVenues([]);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    fetchVenues();
+
+  }, []);
+
+  // ✅ FILTER VENUES
   const filteredVenues =
     selectedCategory === "All"
       ? venues
       : venues.filter(
-          venue => venue.category === selectedCategory
+          (venue) =>
+            venue.category === selectedCategory
         );
 
   return (
-    <div className='h-screen w-screen  bg-white flex flex-col gap-8 px-10 py-10 pt-24'>
-       <div className='bg-gray-200 h-30  px-10 py-5 flex flex-col gap-2 rounded-2xl w-full'>
-        <h1 className='text-4xl font-bold '> Find Your Perfect Venue</h1>
-        <p className='text-gray-500 text-xl'>Browse premium corporate spaces for meetings, events, and team gatherings.</p>
-          </div> 
 
+    <div className='min-h-screen w-full bg-white pt-28 px-10 pb-10 flex flex-col gap-8'>
 
-           <div className="p-10 bg-gray-200  rounded-2xl ">
+      {/* HEADER */}
+      <div className='bg-gray-200 rounded-2xl p-8 flex flex-col gap-2'>
 
-      {/* Venue Type Section */}
-      <h2 className="text-xl font-semibold mb-4">
-        Venue Type
-      </h2>
+        <h1 className='text-4xl font-bold text-indigo-950'>
+          Find Your Perfect Venue
+        </h1>
 
-      <div className="flex gap-3 flex-wrap mb-6">
-
-        {categories.map((cat) => (
-
-          <motion.button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            animate={{
-              backgroundColor:
-                selectedCategory === cat
-                  ? "#2563eb"
-                  : "#f3f4f6",
-              color:
-                selectedCategory === cat
-                  ? "white"
-                  : "black"
-            }}
-            className="px-4 py-2 rounded-full border"
-          >
-            {cat}
-          </motion.button>
-
-        ))}
+        <p className='text-gray-600 text-lg'>
+          Browse premium corporate spaces for meetings,
+          events and team gatherings.
+        </p>
 
       </div>
 
-      {/* Venue Cards */}
-     <div className="flex gap-6 flex-wrap">
+      {/* FILTER SECTION */}
+      <div className='bg-gray-100 rounded-2xl p-8'>
 
-  {filteredVenues.map((venue, index) => (
+        <h2 className='text-2xl font-bold mb-5 text-indigo-950'>
+          Venue Type
+        </h2>
 
-    <BookingPage
-      key={index}
-      venue={venue}
-    />
+        {/* CATEGORY BUTTONS */}
+        <div className='flex flex-wrap gap-3 mb-8'>
 
-  ))}
+          {categories.map((cat) => (
 
-</div>
+            <motion.button
+              key={cat}
+              onClick={() =>
+                setSelectedCategory(cat)
+              }
+              whileTap={{ scale: 0.95 }}
+              animate={{
+                backgroundColor:
+                  selectedCategory === cat
+                    ? "#312e81"
+                    : "#ffffff",
 
+                color:
+                  selectedCategory === cat
+                    ? "#ffffff"
+                    : "#111827"
+              }}
+              className='px-5 py-2 rounded-full border font-medium shadow-sm'
+            >
+              {cat}
+            </motion.button>
+
+          ))}
+
+        </div>
+
+        {/* LOADING */}
+        {loading && (
+
+          <div className='text-2xl text-gray-500'>
+            Loading venues...
+          </div>
+
+        )}
+
+        {/* VENUES */}
+        {!loading && (
+
+          <div className='flex flex-wrap gap-6'>
+
+            {filteredVenues.length > 0 ? (
+
+              filteredVenues.map((venue) => (
+
+                <BookingPage
+                  key={venue._id}
+                  venue={venue}
+                />
+
+              ))
+
+            ) : (
+
+              <div className='text-2xl text-gray-500 font-medium'>
+
+                No venues found
+
+              </div>
+
+            )}
+
+          </div>
+
+        )}
 
       </div>
 
     </div>
-      
-  
-    
+
   )
 }
 

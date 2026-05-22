@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 const section1 = () => {
   return (
-  <div className='pt-22 h-screen w-screen'>
+  <div className='pt-24 h-screen w-screen'>
     <div className=' flex flex-col justify-center items-center gap-8 '>
          <div className='pt-23   h-100 w-350 bg-no-repeat bg-cover object-cover bg-[url(https://plus.unsplash.com/premium_photo-1681995453325-455f7084888d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fG1lZXRpbmd8ZW58MHx8MHx8fDA%3D)]'>
          <div className='px-5'>

@@ -1,116 +1,98 @@
 import React from 'react'
 import { MapPin, UserRound } from "lucide-react"
-import { motion } from 'motion/react'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
-const BookingPage = ({ venues }) => {
-
+const BookingPage = ({ venue }) => {
+  const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
-  // 📅 BOOK VENUE
-  const handleBooking = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (!user) {
-      alert("Please login first");
-      return;
-    }
-
-    const existingBookings = JSON.parse(localStorage.getItem("bookings")) || [];
-
-    const newBooking = {
-      venueName: venues?.name,
-      userEmail: user.email,
-      date: new Date().toLocaleString()
-    };
-
-    localStorage.setItem(
-      "bookings",
-      JSON.stringify([...existingBookings, newBooking])
-    );
-
-    // 🔁 BACKEND
-    
-    await axios.post("/api/bookings", {
-      venueId: venues.id,
-      userId: user.id
-    });
-   
-
-    alert("Venue Booked!");
-  };
-
-  // 🔍 GO TO DETAIL PAGE
   const handleDetails = () => {
-    navigate("/venue-details", { state: { venue: venues } });
+    navigate("/VenueDetailPage", {
+      state: { venue }
+    });
   };
 
   return (
-    <div className='bg-white shadow-lg hover:shadow-gray-400 h-100 w-80 rounded-xl text-indigo-950 gap-5'>
-      
+    <div className='bg-white shadow-lg hover:shadow-gray-400 h-115 w-80 rounded-xl text-indigo-950 gap-5'>
       <div className='p-2'>
         <img
-          className="rounded-t-xl object-cover"
-          src="https://plus.unsplash.com/premium_photo-1681487146511-43e0a6382a83?w=600"
+          className="rounded-t-xl object-cover h-50 w-full"
+          src={venue?.image}
+          alt={venue?.name}
         />
 
-        <div className='flex flex-col gap-2'>
-
+        <div className='flex flex-col gap-2 mt-3'>
           <div className='flex flex-col gap-2'>
-            
-            <h3 className='flex'>
+            <h3 className='flex items-center gap-1 text-gray-600'>
               <MapPin size={20}/>
-              {venues?.city || "Location"}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue?.location || '')}`}
+                className='text-xl text-blue-600 underline'
+              >
+                {venue?.location}
+              </a>
             </h3>
 
-            <h2 className='font-bold text-2xl'>
-              {venues?.name || "Venue Name"}
-            </h2>
+            <h2 className='font-bold text-2xl'>{venue?.name}</h2>
 
-            <div className='grid grid-cols-2 grid-rows-2 gap-2'>
-              <h4 className='bg-gray-300 rounded-2xl h-6 w-30 text-center'>Style: Boardroom</h4>
-              <h4 className='bg-gray-300 rounded-2xl h-6 w-30 text-center'>4k Display</h4>
-              <h4 className='bg-gray-300 rounded-2xl h-6 w-30 text-center'>Projector</h4>
+            <div className='grid grid-cols-2 gap-2'>
+              <h4 className='bg-gray-300 rounded-2xl h-6 px-3 text-center'>{venue?.category}</h4>
+              <h4 className='bg-gray-300 rounded-2xl h-6 px-3 text-center'>Capacity {venue?.capacity}</h4>
             </div>
           </div>
-          
-          <div className='flex gap-5 p-1 font-bold border-t-2 border-gray-400'>
-            
-            <h3 className='flex text-2xl'>
-              <UserRound size={30}/>
-              {venues?.capacity || "0"}
+
+          <div className='flex items-center justify-between p-1 font-bold border-t-2 border-gray-400 mt-3'>
+            <h3 className='flex text-2xl items-center gap-1'>
+              <UserRound size={25}/>
+              {venue?.capacity}
             </h3>
 
-            <button className='rounded-md w-26 h-10 font-bold'>
-              ₹{venues?.price || "0"}
+            <button className='rounded-md px-3 h-10 font-bold bg-gray-100'>
+              ₹{venue?.pricePerHour}
             </button>
-                { /* 📅 OPTIONAL BOOK BUTTON (separate) */}
-              <motion.button
-            onClick={handleBooking}
-            className='bg-green-600 text-white rounded-md h-10 w-50'
-          >
-           Book
-          </motion.button>
 
-            {/* 🔍 DETAILS BUTTON */}
             <motion.button
               onClick={handleDetails}
-              whileHover={{backgroundColor:"white",border:"1px solid indigo",color:"indigo"}}
-              whileTap={{backgroundColor:"indigo",color:"white"}}
-              className='bg-indigo-950 text-white rounded-md w-60 h-10'
+              whileHover={{
+                backgroundColor: "white",
+                border: "1px solid indigo",
+                color: "indigo"
+              }}
+              whileTap={{
+                backgroundColor: "indigo",
+                color: "white"
+              }}
+              className='bg-indigo-950 text-white rounded-md px-5 h-10'
             >
               Details
             </motion.button>
-
           </div>
 
-          
-        
-
+          {/* DYNAMIC ACTION BUTTON ZONE */}
+          {user?.role === "admin" || user?.role === "owner" ? (
+            <motion.button
+              onClick={() => navigate("/edit-venue", { state: { venue } })}
+              whileHover={{ backgroundColor: "#2563eb" }}
+              className='bg-blue-600 text-white rounded-md px-5 h-10 w-full mt-2'
+            >
+              Edit Venue
+            </motion.button>
+          ) : (
+            <motion.button
+              onClick={handleDetails}
+              whileHover={{ backgroundColor: "#1e1b4b" }}
+              className='bg-indigo-900 text-white rounded-md px-5 h-10 w-full mt-2 font-medium'
+            >
+              Book Now
+            </motion.button>
+          )} 
         </div>
       </div>
     </div>
   )
 }
 
-export default BookingPage
+export default BookingPage;

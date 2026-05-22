@@ -1,67 +1,295 @@
-import React from 'react'
-import { LogOut,Bookmark,Clock7,Building2,TrendingUp } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import {
+  LogOut,
+  Bookmark,
+  Clock7,
+  Building2,
+  TrendingUp
+} from 'lucide-react'
 
+import { useNavigate } from "react-router-dom";
+import API from "../services/api";
 
 const UserDashboard = () => {
+
+  const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const [bookings, setBookings] = useState([]);
+
+  // ✅ FETCH BOOKINGS
+  useEffect(() => {
+
+    const fetchBookings = async () => {
+
+      try {
+
+       const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+        const res = await API.get(
+          "/bookings/my-bookings",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setBookings(res.data);
+
+      } catch (err) {
+
+        console.error(err);
+
+      }
+
+    };
+
+    fetchBookings();
+
+  }, []);
+
+  // ✅ CALCULATIONS
+  const totalBookings = bookings.length;
+
+  const totalHours = bookings.reduce((acc, b) => {
+
+    return acc + (
+      parseInt(b.endTime) - parseInt(b.startTime)
+    );
+
+  }, 0);
+
+  const totalSpend = bookings.reduce((acc, b) => {
+
+    return acc + (b.totalPrice || 0);
+
+  }, 0);
+
+  const handleLogout = () => {
+
+  localStorage.clear();
+
+  navigate("/login");
+
+};
+
   return (
-    <div className='bg-white w-screen' >
-      <div className='flex gap-5'>
-       <div className='bg-gray-200  w-100 p-4'>
-          <div className='flex p-2 border-b-2 border-b-gray-700 gap-2 '>
-           <img  className='h-20 w-20 rounded-full' src='https://plus.unsplash.com/premium_photo-1738637233381-6f857ce13eb9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fG1lbiUyMHVzZXIlMjBwcm9maWx8ZW58MHx8MHx8fDA%3D'/>
-           <div className='p-3 '>
-           <h1 className='text-3xl'> ALexa Johnson</h1>
-           <p>Owner</p>
-           </div>
+
+    <div className='pt-24 bg-white w-screen min-h-screen'>
+
+      <div className='flex'>
+
+        {/* SIDEBAR */}
+        <div className='bg-gray-200 w-80 p-4'>
+
+          <div className='flex p-2 border-b-2 border-gray-400 gap-2'>
+
+            <img
+              className='h-16 w-16 rounded-full'
+              src='https://i.pravatar.cc/150'
+              alt="user"
+            />
+
+            <div>
+              <h1 className='text-xl font-bold'>
+                {user?.name}
+              </h1>
+
+              <p>{user?.role}</p>
+            </div>
+
           </div>
-            <div className='text-3xl text-indigo-950 p-3 leading-[1.3] space-y-2'>
-                     <h3 className='flex gap-3'>Dashboard</h3>
-                     <h3 className='flex gap-3'>My Venues</h3>
-                     <h3 className='flex gap-3'>Profile</h3>
-                     <h3 className='flex gap-3 '><LogOut size={50}/>Logout</h3>
-                     </div>
-         
+
+          <div className='text-xl text-indigo-950 mt-5 space-y-3'>
+
+            <h3
+              onClick={() => navigate("/UserDashboard")}
+              className='cursor-pointer'
+            >
+              Dashboard
+            </h3>
+
+            <h3
+              onClick={() => navigate("/my-booking-page")}
+              className='cursor-pointer'
+            >
+              My Bookings
+            </h3>
+
+            <h3 className='cursor-pointer'
+             onClick={() => navigate("/UserDetail")}>
+              Profile
+            </h3>
+
+            <button
+               onClick={handleLogout}
+            >
+              <LogOut />
+              Logout
+            </button>
+
+          </div>
+
         </div>
 
-        <div className=' bg-gray-200 w-full'>       
-        <div className='p-5'>
-      <h1 className='text-4xl'> Welcome Back, Jane</h1>
-      <h3>Here's an overview of your venue bookings and activity.</h3>
+        {/* MAIN */}
+        <div className='bg-gray-100 w-full p-6'>
+
+          <h1 className='text-3xl font-bold mb-2'>
+            Welcome back, {user?.name}
+          </h1>
+
+          <p className='text-gray-600 mb-6'>
+            Here's your booking activity.
+          </p>
+
+          {/* STATS */}
+          <div className='flex gap-5 flex-wrap'>
+
+            <div className='h-32 w-60 bg-white rounded-xl p-4 shadow'>
+
+              <h1 className='flex'>
+                Total Bookings
+
+                <span className='ml-auto'>
+                  <Bookmark/>
+                </span>
+              </h1>
+
+              <h2 className='text-3xl font-bold'>
+                {totalBookings}
+              </h2>
+
+            </div>
+
+            <div className='h-32 w-60 bg-white rounded-xl p-4 shadow'>
+
+              <h1 className='flex'>
+                Venues Used
+
+                <span className='ml-auto'>
+                  <Building2/>
+                </span>
+              </h1>
+
+              <h2 className='text-3xl font-bold'>
+                {totalBookings}
+              </h2>
+
+            </div>
+
+            <div className='h-32 w-60 bg-white rounded-xl p-4 shadow'>
+
+              <h1 className='flex'>
+                Hours Booked
+
+                <span className='ml-auto'>
+                  <Clock7/>
+                </span>
+              </h1>
+
+              <h2 className='text-3xl font-bold'>
+                {totalHours}
+              </h2>
+
+            </div>
+
+            <div className='h-32 w-60 bg-white rounded-xl p-4 shadow'>
+
+              <h1 className='flex'>
+                Total Spend
+
+                <span className='ml-auto'>
+                  <TrendingUp/>
+                </span>
+              </h1>
+
+              <h2 className='text-3xl font-bold'>
+                ₹{totalSpend}
+              </h2>
+
+            </div>
+
+          </div>
+
+          {/* ✅ BOOKINGS TABLE */}
+
+          <div className='bg-white rounded-xl shadow mt-10 p-5'>
+
+            <h2 className='text-2xl font-bold mb-5'>
+              Recent Bookings
+            </h2>
+
+            {bookings.length === 0 ? (
+
+              <p>No bookings found</p>
+
+            ) : (
+
+              <table className='w-full text-left'>
+
+                <thead>
+
+                  <tr className='border-b h-12'>
+
+                    <th>Venue</th>
+
+                    <th>Date</th>
+
+                    <th>Time</th>
+
+                    <th>Seats</th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  {bookings.map((b) => (
+
+                    <tr
+                      key={b._id}
+                      className='border-b h-14'
+                    >
+
+                      <td>
+                        {b.venue?.name}
+                      </td>
+
+                      <td>
+                        {b.date}
+                      </td>
+
+                      <td>
+                        {b.startTime}:00 - {b.endTime}:00
+                      </td>
+
+                      <td>
+                        {b.seats}
+                      </td>
+
+                    </tr>
+
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            )}
+
+          </div>
+
+        </div>
+
       </div>
-      <div className='flex flex-col  gap-10'>
 
-      <div className='  flex gap-5 justify-center items-center'>
-        <div className='h-40 w-60 bg-white rounded-xl '>
-          <h1 className='text-2xl p-3 flex'>Total Bookings<span className='ml-auto p-1'>< Bookmark/></span></h1>
-          <h2 className='font-bold text-4xl p-4'c>128</h2>
-          <p></p>
-        </div>
-        <div className='h-40 w-60 bg-white rounded-xl '>
-          <h1 className='text-2xl p-3 flex' >Venues used <span  className='ml-auto p-1'><Building2/></span></h1>
-          <h2 className='font-bold text-4xl p-4'>14</h2>
-        </div>
-        <div className='h-40 w-60 bg-white rounded-xl '>
-          <h1 className='text-2xl p-3 flex'>Hours Booked <span className='ml-auto p-1'><Clock7/></span></h1>
-          <h2 className='font-bold text-4xl p-4'>234</h2>
-        </div>
-        <div className='h-40 w-60 bg-white rounded-xl '>
-          <h1 className='text-2xl p-3 flex'>Monthly Spend<span className='ml-auto p-1'><TrendingUp/></span></h1>
-          <h2 className='font-bold text-4xl p-4'>1200</h2>
-        </div>
-      </div>
-
-
-
-         
-        
-      
-      </div>
     </div>
-    
-      
-      </div>
-    </div>
+
   )
 }
 
-export default UserDashboard
+export default UserDashboard;
