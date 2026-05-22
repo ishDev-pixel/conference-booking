@@ -1,4 +1,5 @@
 
+
 import { Route,Routes } from 'react-router-dom'
 
 import LandingPage from './layouts/LandingPage'
@@ -60,4 +61,3 @@ const App = () => {
 }
 
 export default App
-
