@@ -7,7 +7,7 @@ import About from './layouts/About'
 import Navbar from './layouts/Navbar'
 import BookingPage from './pages/BookingPage'
 import VenuePage from './components/venue/VenuePage'
-import VenueContext from './components/venue/VenueContext'
+
 import VenueDetailPage from './components/venue/VenueDetailPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -39,7 +39,6 @@ const App = () => {
         <Route path='/Register' element={<Register/>} />
         <Route path='BookingPage' element={<BookingPage/>}/>
 
-        <Route path='/VenueContext' element={<VenueContext/>}/>
         <Route path='/VenueDetailPage' element={<VenueDetailPage/>}/>
         <Route path="/my-booking-page" element={<MyBookingsPage />} />
          <Route path="/UserDashboard" element={<UserDashboard />} />

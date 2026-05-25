@@ -171,11 +171,12 @@ const AdminDetails = () => {
             </h3>
             <h3
               className='cursor-pointer hover:text-indigo-700 transition'
-              onClick={() => navigate("/edit-venue")}
+              onClick={() => navigate("/AdminDashboard")}
             >
               My Venues
             </h3>
-            <h3 className='cursor-pointer text-indigo-600 font-semibold'>
+            <h3 className='cursor-pointer text-indigo-600 font-semibold'
+            onClick={() => navigate("/AdminDetails")}>
               Profile
             </h3>
             <h3
